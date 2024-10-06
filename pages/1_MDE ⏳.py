@@ -1,7 +1,6 @@
 import streamlit as st
 from modules.nav import Navbar
-from statsmodels.stats.power import zt_ind_solve_power
-import math
+from modules.calc_mde import calculate_mde
 import pandas as pd
 
 st.set_page_config(
@@ -10,21 +9,6 @@ st.set_page_config(
     , layout="centered"
     , initial_sidebar_state="auto"
     , menu_items=None)
-
-# Function definition to calculate the mde
-def calculate_mde(alpha, power, p1, n, alternative):
-    # Calculate the effect size using statsmodels
-    effect_size = zt_ind_solve_power(effect_size=None # returns the effect size as a standardized value
-                                     , nobs1=n 
-                                     , alpha=alpha 
-                                     , power=power 
-                                     , alternative=alternative
-                                     , ratio = 1.0
-                                     )
-    # Translate effect size to MDE
-    mde = effect_size * math.sqrt(p1 * (1 - p1))
-    return mde
-
 
 def main():
     Navbar()
