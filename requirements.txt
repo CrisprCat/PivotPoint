@@ -1,3 +1,5 @@
 streamlit
 statsmodels
 scipy
+numpy
+pandas
