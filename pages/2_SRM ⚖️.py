@@ -44,18 +44,22 @@ def main():
                 with col1:
                     sample_size = st.number_input(f"Visits in Sample {i+1}:"
                                                   , key = f"input_{i+1}"
-                                                  , min_value = 0
+                                                  , min_value = 1
                                                   , max_value = None
+                                                  , value = None
                                                   , step = 1
+                                                  , placeholder = 'Enter a number'
                                                   )
                     sample_sizes.append(sample_size)
             else:
                 with col2:
                     sample_size = st.number_input(f"Visits in Sample {i+1}:"
                                                   , key = f"input_{i+1}"
-                                                  , min_value = 0
+                                                  , min_value = 1
                                                   , max_value = None
+                                                  , value = None
                                                   , step = 1
+                                                  , placeholder = 'Enter a number'
                                                   )
                     sample_sizes.append(sample_size)
 
@@ -70,8 +74,9 @@ def main():
                         exp_frequency = st.number_input(f"What is your expected frequency in Sample {i+1}:"
                                                         , min_value= 0.00
                                                         , max_value =1.00
-                                                        , value = "min"
+                                                        , value = None
                                                         , step = 0.05
+                                                        , placeholder = 'Enter a number'
                                                         )
                         exp_freq.append(exp_frequency)
                 else:
@@ -79,8 +84,9 @@ def main():
                         exp_frequency = st.number_input(f"What is your expected frequency in Sample {i+1}:"
                                                         , min_value= 0.00
                                                         , max_value =1.00
-                                                        , value = "min"
+                                                        , value = None
                                                         , step = 0.05
+                                                        , placeholder = 'Enter a number'
                                                         )
                         exp_freq.append(exp_frequency)
 

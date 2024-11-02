@@ -47,20 +47,24 @@ with st.container():
     col1, col2, col3 = st.columns(3)
     with col1:
         Visits_control = st.number_input('Number of visits'
-                                         , min_value = 0
+                                         , min_value = 1
                                          , max_value = None
-                                         , step = 1
                                          , value = None
+                                         , step = 1
+                                         , help = '''Enter the number of visits that you had in the control'''
                                          , placeholder = 'Enter a number'
-                                         , help = '''Enter the number of visits that you had in the control''')
+                                         )
     with col2:
         Orders_control = st.number_input('Number of orders'
-                                         , min_value = 0
+                                         , min_value = 1
                                          , max_value = None
+                                         , value = None
                                          , step = 1
-                                         , help = '''Enter the number of orders that you had in the control''')
+                                         , help = '''Enter the number of orders that you had in the control'''
+                                         , placeholder = 'Enter a number'
+                                         )
     with col3:
-        if Visits_control != 0 and Orders_control != 0:
+        if Visits_control != None and Orders_control != None:
             CR_control = Orders_control / Visits_control
             st.metric("Control Conversion Rate"
                       , value = f"{round(CR_control * 100, 2)} %")
@@ -70,24 +74,30 @@ with st.container():
     col1, col2, col3 = st.columns(3)
     with col1:
         Visits_variant = st.number_input('Number of visits'
-                                         , min_value = 0
+                                         , min_value = 1
                                          , max_value = None
+                                         , value = None
                                          , step = 1
-                                         , help = '''Enter the number of visits that you had in the variant''')
+                                         , help = '''Enter the number of visits that you had in the variant'''
+                                         , placeholder = 'Enter a number'
+                                         )
     with col2:
         Orders_variant = st.number_input('Number of orders'
-                                         , min_value = 0
+                                         , min_value = 1
                                          , max_value = None
+                                         , value = None
                                          , step = 1
-                                         , help = '''Enter the number of orders that you had in the variant''')
+                                         , help = '''Enter the number of orders that you had in the variant'''
+                                         , placeholder = 'Enter a number'
+                                         )
     with col3:
-        if Visits_variant != 0 and Orders_variant != 0:
+        if Visits_variant != None and Orders_variant != None:
             CR_variant = Orders_variant / Visits_variant
             st.metric("Variant Conversion Rate"
                       , value = f"{round(CR_variant * 100, 2)} %")
             
 ## SRM check of input data
-    if Visits_control != 0 and Visits_variant != 0:
+    if Visits_control != None and Visits_variant != None:
         sample_sizes = [Visits_control, Visits_variant]
         SRM_result = chisquare(sample_sizes
                                , f_exp = None)
@@ -97,10 +107,11 @@ with st.container():
 
 with st.container():
     col1, col2 = st.columns([1,2])
-    if Visits_control != 0 and Orders_control != 0 and Visits_variant != 0 and Orders_variant != 0:
+    if Visits_control != None and Orders_control != None and Visits_variant != None and Orders_variant != None:
         stat, pval = pp.proportions_ztest(count = [Orders_control, Orders_variant]
-                                                  , nobs = sample_sizes
-                                                  , alternative = 'two-sided')
+                                          , nobs = sample_sizes
+                                          , alternative = 'two-sided'
+                                          )
         diff = CR_variant - CR_control
         lift = diff / CR_control * 100
 

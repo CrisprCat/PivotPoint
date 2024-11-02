@@ -27,11 +27,12 @@ def main():
 
         with colA1:
             weekly_visits = st.number_input('Average weekly visits'
-                                            , min_value = 0
+                                            , min_value = 1
                                             , max_value = None
-                                            # , value = 120000
+                                            , value = None
                                             , step = 1
                                             , help = 'Enter the number of average weekly visits you expect during your experiment'
+                                            , placeholder = ' Enter a number'
                                             )
             power = st.number_input('Statistical power'
                                     , value = 0.80
@@ -45,11 +46,12 @@ def main():
                 st.warning('⚠️ This statistical power is considered low!')
         with colA2:
             weekly_orders = st.number_input('Average weekly conversions'
-                                            , min_value = 0
+                                            , min_value = 1
                                             , max_value = None
-                                            # , value = 6000
+                                            , value = None
                                             , step = 1
                                             , help = 'Enter the number of average weekly conversions you expect during your experiment. These conversions can be orders or any microconversion you define.'
+                                            , placeholder = 'Enter a number'
                                             )
             alpha = st.number_input('Statistical significance level'
                                     , value = 0.05
@@ -81,7 +83,7 @@ def main():
 
 
     # calculate output
-    if weekly_visits != 0 and weekly_orders != 0: # calculations should only run when variables are unequal to 0 to avoid errors.
+    if weekly_visits != None and weekly_orders != None: # calculations should only run when variables are unequal to 0 to avoid errors.
         CR = weekly_orders / weekly_visits
         Num_of_weeks = [1, 2, 3, 4, 5, 6]
         sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
