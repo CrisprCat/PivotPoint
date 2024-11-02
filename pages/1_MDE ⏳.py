@@ -89,6 +89,7 @@ def main():
         sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
         mde_per_week = []
         potential_CR = []
+        difference_CR = []
 
         if hypo_type == 'One-sided':
             hypo = 'larger'
@@ -102,13 +103,16 @@ def main():
                                   , n = i * weekly_visits / num_of_variants
                                   , alternative = hypo
                                   )
-            mde = round((mde_i/CR*100), 2)
+            mde = mde_i/CR*100
             CR_new = CR * (1 + (mde / 100)) * 100
+            CR_diff = ((CR_new / 100) - CR) * 100
             mde_per_week.append(mde)
             potential_CR.append(CR_new)
+            difference_CR.append(CR_diff)
 
         result = pd.DataFrame({'Runtime' : Num_of_weeks
-                               , 'MDE' : mde_per_week
+                               , 'MDE_perc' : mde_per_week
+                               , 'MDE_PP' : difference_CR
                                , 'Sample_size' : sample_size_per_week
                                , 'new_CR' : potential_CR
                                }) 
@@ -128,18 +132,22 @@ def main():
                              , hide_index = 1
                              , column_config = {
                                 'Runtime' : 'Runtime (weeks)',
-                                'MDE': st.column_config.NumberColumn(
-                                    'MDE',
-                                    help = 'Minimal detectable effect',
+                                'MDE_perc': st.column_config.NumberColumn(
+                                    'MDE in %',
+                                    help = 'Minimal detectable effect in percent',
                                     format = "%.2f %%"),
+                                'MDE_PP': st.column_config.NumberColumn(
+                                    'MDE in PP',
+                                    help = 'Minimal detectable effect in Percent points',
+                                    format = "%.2f PP"),
                                 'Sample_size' : 'Sample size per variant',
                                 'new_CR' : st.column_config.NumberColumn(
                                     'Potential CR',
                                     format = "%.2f %%")
                                 })
-                st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {result.loc[0, 'MDE']} %. This could mean an increase of your Conversion Rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE']/100), 2)} %")
+                st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {result.loc[0, 'MDE_perc']} %. This could mean an increase of your Conversion Rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
 
-        if result.loc[5, 'MDE'] >= 5.00:
+        if result.loc[5, 'MDE_perc'] >= 5.00:
             st.warning('💡 Your MDE is quite high. Consider if the contrast of you A/B test is high enough.')
 
 if __name__ == '__main__':
