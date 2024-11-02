@@ -1,5 +1,5 @@
 import streamlit as st
-from modules.nav import Navbar
+from modules.functions import Navbar
 
 def main():
     Navbar()

@@ -1,6 +1,6 @@
 import streamlit as st
-from modules.nav import Navbar
-from modules.calc_mde import calculate_mde
+from modules.functions import Navbar
+from modules.functions import calculate_mde
 import pandas as pd
 
 st.set_page_config(

@@ -1,5 +1,5 @@
 import streamlit as st
-from modules.nav import Navbar
+from modules.functions import Navbar
 
 st.set_page_config(
     page_title="PivotPoint"

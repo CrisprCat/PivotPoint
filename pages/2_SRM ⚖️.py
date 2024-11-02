@@ -1,5 +1,5 @@
 import streamlit as st
-from modules.nav import Navbar
+from modules.functions import Navbar
 import numpy as np
 from scipy.stats import chisquare
 
