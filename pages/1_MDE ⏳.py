@@ -14,7 +14,8 @@ def main():
     Navbar()
     # Page design
     st.title ('Minimal detectable effect (MDE) calculator')
-    st.caption('Use this calculator to understand the MDE that you can statistically reliably detect, depending on your websites traffic, the statistical power and significance level you want to reach, and the time you can run your experiment.')
+    st.caption(f'''Use this calculator to understand the MDE that you can statistically reliably detect, depending on your websites traffic, the statistical power and significance level you want to reach, and the time you can run your experiment.  
+               You should choose your runtime to statistically reliably detect an effect size that is meaningful for your business, ensuring that the experiment can capture a difference that would have real value or impact on your key metrics!''')
 
     # Input container
     with st.container():
