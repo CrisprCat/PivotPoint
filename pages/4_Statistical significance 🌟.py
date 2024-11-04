@@ -2,6 +2,8 @@ import streamlit as st
 from modules.functions import Navbar
 from scipy.stats import chisquare
 import statsmodels.stats.proportion as pp
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def main():
     Navbar()
@@ -24,6 +26,12 @@ with st.container():
                                         )
         if power < 0.8:
             st.warning('⚠️ This statistical power is considered low!')
+        mde = st.number_input('Pre-calculate MDE'
+                              , min_value = 0.00
+                              , max_value = 100.00
+                              , value = None
+                              , placeholder = 'Enter MDE in %'
+                              , help = '''Your MDE should have a business relevant value.''' )
         
     with col2:
         alpha = st.number_input('Statistical significance level'
@@ -65,9 +73,9 @@ with st.container():
                                          )
     with col3:
         if Visits_control != None and Orders_control != None:
-            CR_control = Orders_control / Visits_control
+            CR_control = Orders_control / Visits_control * 100
             st.metric("Control Conversion Rate"
-                      , value = f"{round(CR_control * 100, 2)} %")
+                      , value = f"{round(CR_control, 2)} %")
             
 with st.container():
     st.subheader("Variant")
@@ -92,9 +100,9 @@ with st.container():
                                          )
     with col3:
         if Visits_variant != None and Orders_variant != None:
-            CR_variant = Orders_variant / Visits_variant
+            CR_variant = Orders_variant / Visits_variant * 100
             st.metric("Variant Conversion Rate"
-                      , value = f"{round(CR_variant * 100, 2)} %")
+                      , value = f"{round(CR_variant, 2)} %")
             
 ## SRM check of input data
     if Visits_control != None and Visits_variant != None:
@@ -105,15 +113,110 @@ with st.container():
             st.warning(f"""With a p-value smaller than 0.1 ({round(SRM_result.pvalue, 3)}) a possible SRM is detected. Please check your data collection process before analysing the test results.""")
 
 
-with st.container():
-    col1, col2 = st.columns([1,2])
-    if Visits_control != None and Orders_control != None and Visits_variant != None and Orders_variant != None:
-        stat, pval = pp.proportions_ztest(count = [Orders_control, Orders_variant]
-                                          , nobs = sample_sizes
-                                          , alternative = 'two-sided'
-                                          )
-        diff = CR_variant - CR_control
-        lift = diff / CR_control * 100
+        with st.container():
+            col1, col2, col3 = st.columns(3)
+            if Visits_control != None and Orders_control != None and Visits_variant != None and Orders_variant != None:
+                # Calculate summary
+                diff = CR_variant - CR_control
+                lift = diff / CR_control * 100
+
+                # Determine Hypothesis type
+                if test_type == 'One-sided' and diff < 0:
+                    hypo_type = 'larger'
+                elif test_type == 'One-sided' and diff > 0:
+                    hypo_type = 'smaller'
+                else:
+                    hypo_type = 'two-sided'
+                
+                # Statistical hypothesis test
+                stat, pval = pp.proportions_ztest(count = [Orders_control, Orders_variant]
+                                                  , nobs = sample_sizes
+                                                  , alternative = hypo_type
+                                                  )
+                if pval > alpha:
+                    st.warning(f"""With a p-value of {round(pval, 3)} your result is not statistically significant.""")
+                else:
+                    st.success(f"""With a p-value of {round(pval, 3)} your result is statistically significant.""")
+
+                
+                # # Confidence interval
+                # ## If you expect a positive result the CI should not cover 0
+                # ## The CI should be narrow around your MDE
+                # ### Rule of thumb: Narrow means estimated_effect_size in percent points +/- 1/2 MDE in percent points
+                # ci_low, ci_upp = pp.confint_proportions_2indep(count1 = Orders_variant
+                #                                                , nobs1 = Visits_variant
+                #                                                , count2 = Orders_control
+                #                                                , nobs2 = Visits_variant
+                #                                                , method = 'score' # Alternatives: 'wald', 'agrestio-caffo', 'newcomb', 'score'
+                #                                                , compare = 'diff'
+                #                                                , alpha = alpha
+                #                                                , correction = True)
+                
+                # exp_low = diff - 0.5 * diff
+                # exp_upp = diff + 0.5 * diff
+
+                # # Create a dataframe
+                # names = ['ci', 'ci', 'exp', 'exp']
+                # borders = [ci_low*100, ci_upp*100, exp_low, exp_upp]
+
+                # # Creating DataFrame from lists
+                # df = pd.DataFrame({'Name': names, 'Border': borders})
+                # print(df)
+
+                # # Define a figure object
+                # fig = plt.figure(figsize=(8, 6), dpi=100)
+                # plt.scatter(df['Border'], df['Name'])
+ 
+                # # Adding Title to the Plot
+                # plt.title("Scatter Plot")
+
+                # # Setting the X and Y labels
+                # plt.xlabel('Name')
+                # plt.ylabel('Border')
+
+                # # Adding a red vertical line at Border value 0
+                # plt.axvline(x=0, color='red', linestyle='--')
+
+                # plt.show()
+
+
+                # st.scatter_chart(df
+                #                  , x = 'Border'
+                #                  , y = 'Name')
+                
+                
+                # st.pyplot(fig=fig)
+                
+                # # Output
+                # with col1:
+                #     st.metric("Lift"
+                #               , value = f"{round(lift, 2)} %"
+                #               )
+                #     st.metric("CI low"
+                #               , value = f"{round(ci_low * 100, 5)}"
+                #               )
+                #     st.metric("CI low exp"
+                #               , value = f"{round(exp_low, 5)}"
+                #               )
+                    
+                # with col2:    
+                #     st.metric("Difference"
+                #               , value = f"{round(diff, 2)} PP"
+                #               , help = 'PP = Percent points'
+                #               )
+                #     st.metric("CI upp"
+                #               , value = f"{round(ci_upp * 100, 5)}"
+                #               )
+                #     st.metric("CI upp exp"
+                #               , value = f"{round(exp_upp, 5)}"
+                #               )  
+
+                # with col3:
+                #     st.metric("p-value"
+                #               , value = f"{round(pval, 5)}"
+                #               ) 
+                 
+                    
 
 
 if __name__ == '__main__':
