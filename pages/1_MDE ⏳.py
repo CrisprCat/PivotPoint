@@ -131,20 +131,26 @@ def main():
             with colB2:
                 st.dataframe(data=result
                              , hide_index = 1
+                             , column_order = ("Runtime"
+                                               , "MDE_perc"
+                                               , "MDE_PP"
+                                               , "new_CR"
+                                               , "Sample_size"
+                                               )
                              , column_config = {
-                                'Runtime' : 'Runtime (weeks)',
+                                'Runtime' : '''Time (weeks)''',
                                 'MDE_perc': st.column_config.NumberColumn(
-                                    'MDE in %',
+                                    'MDE (%)',
                                     help = 'Minimal detectable effect in percent',
                                     format = "%.2f %%"),
                                 'MDE_PP': st.column_config.NumberColumn(
-                                    'MDE in PP',
+                                    'MDE (PP)',
                                     help = 'Minimal detectable effect in Percent points',
-                                    format = "%.2f PP"),
-                                'Sample_size' : 'Sample size per variant',
+                                    format = "%.3f PP"),
                                 'new_CR' : st.column_config.NumberColumn(
                                     'Potential CR',
-                                    format = "%.2f %%")
+                                    format = "%.2f %%"),
+                                'Sample_size' : 'Sample size per variant'
                                 })
                 st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {result.loc[0, 'MDE_perc']} %. This could mean an increase of your Conversion Rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
 
