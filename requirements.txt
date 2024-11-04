@@ -3,3 +3,4 @@ statsmodels
 scipy
 numpy
 pandas
+matplotlib
