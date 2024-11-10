@@ -152,7 +152,10 @@ def main():
                                     format = "%.2f %%"),
                                 'Sample_size' : 'Sample size per variant'
                                 })
-                st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {result.loc[0, 'MDE_perc']} %. This could mean an increase of your Conversion Rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+                if hypo_type == 'One-sided':
+                    st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean an increase of your Conversion Rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+                else:
+                    st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean a Conversion rate between {round((CR * 100) * (1 - result.loc[0, 'MDE_perc']/100), 2)} % and {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
 
         if result.loc[5, 'MDE_perc'] >= 5.00:
             st.warning('💡 Your MDE is quite high. Consider if the contrast of you A/B test is high enough.')
