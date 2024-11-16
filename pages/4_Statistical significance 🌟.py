@@ -140,82 +140,82 @@ with st.container():
                     st.success(f"""With a p-value of {round(pval, 3)} your result is statistically significant.""")
 
                 
-                # Confidence interval
-                ## If you expect a positive result the CI should not cover 0
-                ## The CI should be narrow around your MDE
-                ### Rule of thumb: Narrow means estimated_effect_size in percent points +/- 1/2 MDE in percent points
-                ci_low, ci_upp = pp.confint_proportions_2indep(count1 = Orders_variant
-                                                               , nobs1 = Visits_variant
-                                                               , count2 = Orders_control
-                                                               , nobs2 = Visits_variant
-                                                               , method = 'score' # Alternatives: 'wald', 'agrestio-caffo', 'newcomb', 'score'
-                                                               , compare = 'diff'
-                                                               , alpha = alpha
-                                                               , correction = True)
+                # # Confidence interval
+                # ## If you expect a positive result the CI should not cover 0
+                # ## The CI should be narrow around your MDE
+                # ### Rule of thumb: Narrow means estimated_effect_size in percent points +/- 1/2 MDE in percent points
+                # ci_low, ci_upp = pp.confint_proportions_2indep(count1 = Orders_variant
+                #                                                , nobs1 = Visits_variant
+                #                                                , count2 = Orders_control
+                #                                                , nobs2 = Visits_variant
+                #                                                , method = 'score' # Alternatives: 'wald', 'agrestio-caffo', 'newcomb', 'score'
+                #                                                , compare = 'diff'
+                #                                                , alpha = alpha
+                #                                                , correction = True)
                 
-                exp_low = diff - 0.5 * diff
-                exp_upp = diff + 0.5 * diff
+                # exp_low = diff - 0.5 * diff
+                # exp_upp = diff + 0.5 * diff
 
-                # Create a dataframe
-                names = ['ci', 'ci', 'exp', 'exp']
-                borders = [ci_low*100, ci_upp*100, exp_low, exp_upp]
+                # # Create a dataframe
+                # names = ['ci', 'ci', 'exp', 'exp']
+                # borders = [ci_low*100, ci_upp*100, exp_low, exp_upp]
 
-                # Creating DataFrame from lists
-                df = pd.DataFrame({'Name': names, 'Border': borders})
-                print(df)
+                # # Creating DataFrame from lists
+                # df = pd.DataFrame({'Name': names, 'Border': borders})
+                # print(df)
 
-                # Define a figure object
-                fig = plt.figure(figsize=(8, 6), dpi=100)
-                plt.scatter(df['Border'], df['Name'])
+                # # Define a figure object
+                # fig = plt.figure(figsize=(8, 6), dpi=100)
+                # plt.scatter(df['Border'], df['Name'])
  
-                # Adding Title to the Plot
-                plt.title("Scatter Plot")
+                # # Adding Title to the Plot
+                # plt.title("Scatter Plot")
 
-                # Setting the X and Y labels
-                plt.xlabel('Name')
-                plt.ylabel('Border')
+                # # Setting the X and Y labels
+                # plt.xlabel('Name')
+                # plt.ylabel('Border')
 
-                # Adding a red vertical line at Border value 0
-                plt.axvline(x=0, color='red', linestyle='--')
+                # # Adding a red vertical line at Border value 0
+                # plt.axvline(x=0, color='red', linestyle='--')
 
-                plt.show()
+                # plt.show()
 
 
-                st.scatter_chart(df
-                                 , x = 'Border'
-                                 , y = 'Name')
+                # st.scatter_chart(df
+                #                  , x = 'Border'
+                #                  , y = 'Name')
                 
                 
-                st.pyplot(fig=fig)
+                # st.pyplot(fig=fig)
                 
-                # Output
-                with col1:
-                    st.metric("Lift"
-                              , value = f"{round(lift, 2)} %"
-                              )
-                    st.metric("CI low"
-                              , value = f"{round(ci_low * 100, 5)}"
-                              )
-                    st.metric("CI low exp"
-                              , value = f"{round(exp_low, 5)}"
-                              )
+                # # Output
+                # with col1:
+                #     st.metric("Lift"
+                #               , value = f"{round(lift, 2)} %"
+                #               )
+                #     st.metric("CI low"
+                #               , value = f"{round(ci_low * 100, 5)}"
+                #               )
+                #     st.metric("CI low exp"
+                #               , value = f"{round(exp_low, 5)}"
+                #               )
                     
-                with col2:    
-                    st.metric("Difference"
-                              , value = f"{round(diff, 2)} PP"
-                              , help = 'PP = Percent points'
-                              )
-                    st.metric("CI upp"
-                              , value = f"{round(ci_upp * 100, 5)}"
-                              )
-                    st.metric("CI upp exp"
-                              , value = f"{round(exp_upp, 5)}"
-                              )  
+                # with col2:    
+                #     st.metric("Difference"
+                #               , value = f"{round(diff, 2)} PP"
+                #               , help = 'PP = Percent points'
+                #               )
+                #     st.metric("CI upp"
+                #               , value = f"{round(ci_upp * 100, 5)}"
+                #               )
+                #     st.metric("CI upp exp"
+                #               , value = f"{round(exp_upp, 5)}"
+                #               )  
 
-                with col3:
-                    st.metric("p-value"
-                              , value = f"{round(pval, 5)}"
-                              ) 
+                # with col3:
+                #     st.metric("p-value"
+                #               , value = f"{round(pval, 5)}"
+                #               ) 
                  
                     
 
