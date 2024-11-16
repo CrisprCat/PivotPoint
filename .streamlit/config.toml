@@ -1,2 +1,22 @@
 [client]
 showSidebarNavigation = false
+
+
+[theme]
+
+# Primary accent for interactive elements
+primaryColor = '#306844'
+
+# Background color for the main content area
+backgroundColor = '#F6F6F6'
+
+# Background color for sidebar and most interactive widgets
+secondaryBackgroundColor = '#B9F1C0'
+
+# Color used for almost all text
+textColor = '#1A1B1F'
+
+# Font family for all text in the app, except code blocks
+# Accepted values (serif | sans serif | monospace) 
+# Default: "sans serif"
+font = "sans serif"
