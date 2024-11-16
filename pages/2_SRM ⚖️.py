@@ -1,5 +1,6 @@
 import streamlit as st
 from modules.functions import Navbar
+from modules.functions import footer
 import numpy as np
 from scipy.stats import chisquare
 
@@ -115,6 +116,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    footer()
 
 
 

@@ -1,6 +1,7 @@
 import streamlit as st
 from modules.functions import Navbar
 from modules.functions import calculate_mde
+from modules.functions import footer
 import pandas as pd
 
 st.set_page_config(
@@ -162,3 +163,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    footer()

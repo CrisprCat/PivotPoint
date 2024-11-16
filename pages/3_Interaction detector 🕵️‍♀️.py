@@ -1,5 +1,6 @@
 import streamlit as st
 from modules.functions import Navbar
+from modules.functions import footer
 import numpy as np
 import pandas as pd
 from scipy.stats import chi2_contingency
@@ -65,6 +66,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    footer()
 
 
 

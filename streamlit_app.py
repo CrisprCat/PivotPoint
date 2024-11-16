@@ -1,5 +1,6 @@
 import streamlit as st
 from modules.functions import Navbar
+from modules.functions import footer
 
 st.set_page_config(
     page_title="PivotPoint"
@@ -26,3 +27,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    footer()
