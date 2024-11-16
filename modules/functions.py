@@ -1,6 +1,14 @@
 import streamlit as st
 
 def Navbar():
+    st.markdown("""
+    <style>
+        [data-testid=stSidebar] {
+            background-color: #F6F6F6;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
     with st.sidebar:
         st.page_link("streamlit_app.py", label="Home", icon="🏠")
         st.page_link("pages/1_MDE ⏳.py", label="Minimum detectable effect", icon="⏳")
