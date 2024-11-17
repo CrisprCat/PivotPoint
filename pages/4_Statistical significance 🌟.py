@@ -20,7 +20,7 @@ st.title("Statistical hypothesis tester")
 st.caption('''You can use this calculator to test if your experiment result is statistically significant.''')
 
 with st.container():
-    st.header("Binary metric (Conversion rate)")
+    st.header("Binomial metric (Conversion rate)")
     st.subheader("Please input your data:")
     col1, col2, col3 = st.columns(3)
     with col1:

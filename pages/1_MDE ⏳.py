@@ -20,8 +20,8 @@ def main():
 
     # Input container
     with st.container():
-        st.header('Binary Metric (Conversion rate)')
-        st.caption('For a binary metric this calculator uses the z-test for proportions.')
+        st.header('Binomial Metric (Conversion rate)')
+        st.caption('For a binomial metric this calculator uses the z-test for proportions.')
         st.subheader('Input your data:')
 
         # Insert 3 columns to place input widgets in them
