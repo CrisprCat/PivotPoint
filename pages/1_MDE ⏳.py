@@ -20,7 +20,7 @@ def main():
 
     # Input container
     with st.container():
-        st.header('Binomial Metric (Conversion rate)')
+        st.header('Binomial Metric (Conversion rate, CR)')
         st.caption('For a binomial metric this calculator uses the z-test for proportions.')
         st.subheader('Input your data:')
 
@@ -72,45 +72,47 @@ def main():
                                               , value = 2
                                               , step = 1
                                               , help = '''Enter the number of experiment groups you want to test, one control group + a variable number of variants.  
-                                              For more than 2 variants Bonferroni correction is used'''
+                                              For more than 2 variants Bonferroni correction is applied'''
                                               )
             hypo_type = st.radio('Hypothesis type'
-                                 , options = ['One-sided'
-                                              , 'Two-sided'
+                                 , options = ['Two-sided'
+                                              , 'One-sided'
                                               ]
                                  , index = 0
                                  , help = 'Use one-sided when you want to detect an effect in a specific direction (increase or decrease). Use two-sided when you want to detect an effect in either direction. '
                                 )
+    if weekly_orders > weekly_visits:
+        st.error("You can't have more conversions than visits.")
+    elif weekly_orders == weekly_visits:
+        st.warning('⚠️ You have a Conversion rate of 100 %, there seems to be nothing left to optimize 😲')
+    else:
+        # calculate output
+        if weekly_visits != None and weekly_orders != None: # calculations should only run when variables are unequal to 0 to avoid errors.
+            CR = weekly_orders / weekly_visits
+            Num_of_weeks = [1, 2, 3, 4, 5, 6]
+            sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
+            mde_per_week = []
+            potential_CR = []
+            difference_CR = []
 
+            if hypo_type == 'One-sided':
+                hypo = 'larger'
+            else:
+                hypo = 'two-sided'
 
-
-    # calculate output
-    if weekly_visits != None and weekly_orders != None: # calculations should only run when variables are unequal to 0 to avoid errors.
-        CR = weekly_orders / weekly_visits
-        Num_of_weeks = [1, 2, 3, 4, 5, 6]
-        sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
-        mde_per_week = []
-        potential_CR = []
-        difference_CR = []
-
-        if hypo_type == 'One-sided':
-            hypo = 'larger'
-        else:
-            hypo = 'two-sided'
-
-        for i in Num_of_weeks:
-            mde_i = calculate_mde(alpha = alpha /(num_of_variants - 1) # /(num_of_variants - 1) is the bonferroni correction for multiple comparisons
-                                  , power = power
-                                  , p1 = CR
-                                  , n = i * weekly_visits / num_of_variants
-                                  , alternative = hypo
-                                  )
-            mde = mde_i/CR*100
-            CR_new = CR * (1 + (mde / 100)) * 100
-            CR_diff = ((CR_new / 100) - CR) * 100
-            mde_per_week.append(mde)
-            potential_CR.append(CR_new)
-            difference_CR.append(CR_diff)
+            for i in Num_of_weeks:
+                mde_i = calculate_mde(alpha = alpha /(num_of_variants - 1) # /(num_of_variants - 1) is the bonferroni correction for multiple comparisons
+                                      , power = power
+                                      , p1 = CR
+                                      , n = i * weekly_visits / num_of_variants
+                                      , alternative = hypo
+                                      )
+                mde = mde_i/CR*100
+                CR_new = CR * (1 + (mde / 100)) * 100
+                CR_diff = ((CR_new / 100) - CR) * 100
+                mde_per_week.append(mde)
+                potential_CR.append(CR_new)
+                difference_CR.append(CR_diff)
 
         result = pd.DataFrame({'Runtime' : Num_of_weeks
                                , 'MDE_perc' : mde_per_week
@@ -154,7 +156,7 @@ def main():
                                 'Sample_size' : 'Sample size per variant'
                                 })
                 if hypo_type == 'One-sided':
-                    st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean an increase of your Conversion Rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+                    st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean an increase of your Conversion rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
                 else:
                     st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean a Conversion rate between {round((CR * 100) * (1 - result.loc[0, 'MDE_perc']/100), 2)} % and {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
 
