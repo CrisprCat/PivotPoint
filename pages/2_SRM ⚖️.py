@@ -14,7 +14,7 @@ st.set_page_config(
 def main():
     Navbar()
 
-    st.title ("Sample ratio mismatch (SRM) tester")
+    st.title ("Sample ratio mismatch (SRM) detector")
     st.caption('Use this calculator to detect discrepancies between your expected and actual number of visits per sample in your experiment ')
 
     # Initial Input container

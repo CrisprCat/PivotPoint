@@ -16,7 +16,7 @@ st.set_page_config(
 def main():
     Navbar()
 
-    st.title ("Interaction tester")
+    st.title ("Interaction detector")
 
     with st.container():
         st.header("Traffic interactions")

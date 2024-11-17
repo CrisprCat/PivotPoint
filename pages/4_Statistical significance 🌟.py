@@ -16,7 +16,7 @@ st.set_page_config(
 def main():
     Navbar()
 
-st.title("Statistical significance tester")
+st.title("Statistical hypothesis tester")
 st.caption('''You can use this calculator to test if your experiment result is statistically significant.''')
 
 with st.container():
