@@ -3,6 +3,7 @@ from modules.functions import Navbar
 from modules.functions import footer
 from scipy.stats import chisquare
 import statsmodels.stats.proportion as pp
+import statsmodels.stats.power as pw
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -34,12 +35,12 @@ with st.container():
                                         )
         if power < 0.8:
             st.warning('⚠️ This statistical power is considered low!')
-        mde = st.number_input('Pre-calculate MDE'
-                              , min_value = 0.00
-                              , max_value = 100.00
-                              , value = None
-                              , placeholder = 'Enter MDE in %'
-                              , help = '''Your MDE should have a business relevant value.''' )
+        # mde = st.number_input('Pre-calculate MDE'
+        #                       , min_value = 0.00
+        #                       , max_value = 100.00
+        #                       , value = None
+        #                       , placeholder = 'Enter MDE in %'
+        #                       , help = '''Your MDE should have a business relevant value.''' )
         
     with col2:
         alpha = st.number_input('Statistical significance level'
@@ -54,9 +55,16 @@ with st.container():
 
     with col3:
         test_type = st.radio("Hypothesis type"
-                             , ["One-sided", "Two-sided"]
+                             , ["Two-sided", "One-sided"]
                              , help = '''Use one-sided when you want to detect an effect in a specific direction (increase or decrease).  
                              Use two-sided when you want to detect an effect in either direction. ''')
+        if test_type == 'One-sided':
+            test_type = st.radio("Hypothesis direction"
+                                 , ["Larger", "Smaller"]
+                                 , help = '''Choose "Larger" when you want to detect an uplift in the conversion rate.  
+                                 Choose "Smaller" when you want to detect a downlift in the conversion rate.''')
+
+
 
 with st.container():
     st.subheader("Control")
@@ -81,8 +89,9 @@ with st.container():
                                          )
     with col3:
         if Visits_control != None and Orders_control != None:
-            CR_control = Orders_control / Visits_control * 100
-            st.metric("Control Conversion Rate"
+            CR_control = Orders_control / Visits_control
+            CR_control_perc = CR_control * 100
+            st.metric("Control conversion rate"
                       , value = f"{round(CR_control, 2)} %")
             
 with st.container():
@@ -108,8 +117,9 @@ with st.container():
                                          )
     with col3:
         if Visits_variant != None and Orders_variant != None:
-            CR_variant = Orders_variant / Visits_variant * 100
-            st.metric("Variant Conversion Rate"
+            CR_variant = Orders_variant / Visits_variant
+            CR_variant_perc = CR_variant * 100
+            st.metric("Variant conversion rate"
                       , value = f"{round(CR_variant, 2)} %")
             
 ## SRM check of input data
@@ -125,14 +135,14 @@ with st.container():
             col1, col2, col3 = st.columns(3)
             if Visits_control != None and Orders_control != None and Visits_variant != None and Orders_variant != None:
                 # Calculate summary
-                diff = CR_variant - CR_control
-                lift = diff / CR_control * 100
+                diff = CR_variant_perc - CR_control_perc
+                lift = diff / CR_control_perc * 100
 
                 # Determine Hypothesis type
-                if test_type == 'One-sided' and diff < 0:
-                    hypo_type = 'larger'
-                elif test_type == 'One-sided' and diff > 0:
+                if test_type == 'Larger': # and diff < 0:
                     hypo_type = 'smaller'
+                elif test_type == 'Smaller': # and diff > 0:
+                    hypo_type = 'larger'
                 else:
                     hypo_type = 'two-sided'
                 
@@ -145,6 +155,18 @@ with st.container():
                     st.warning(f"""With a p-value of {round(pval, 3)} your result is not statistically significant.""")
                 else:
                     st.success(f"""With a p-value of {round(pval, 3)} your result is statistically significant.""")
+
+                # Determine post-hoc power. Careful! This should not be your default wy to judge if your user reached their sample size. Just use it as a nudge
+                effect = pp.proportion_effectsize (CR_control
+                                                   , CR_variant
+                                                   , method = "normal")
+                
+                posthoc_power = pw.zt_ind_solve_power(effect_size = effect
+                                                      , nobs1 = Visits_control
+                                                      , alpha = alpha
+                                                      , alternative = hypo_type)
+                if posthoc_power < 0.8:
+                    st.warning('''Did you reach your pre-calculated sample size?''')
 
                 
                 # # Confidence interval
@@ -195,23 +217,23 @@ with st.container():
                 
                 # st.pyplot(fig=fig)
                 
-                # # Output
-                # with col1:
-                #     st.metric("Lift"
-                #               , value = f"{round(lift, 2)} %"
-                #               )
-                #     st.metric("CI low"
-                #               , value = f"{round(ci_low * 100, 5)}"
-                #               )
-                #     st.metric("CI low exp"
-                #               , value = f"{round(exp_low, 5)}"
-                #               )
+                # Output
+                with col1:
+                    st.metric("Lift"
+                              , value = f"{round(lift, 2)} %"
+                              )
+                    # st.metric("CI low"
+                    #           , value = f"{round(ci_low * 100, 5)}"
+                    #           )
+                    # st.metric("CI low exp"
+                    #           , value = f"{round(exp_low, 5)}"
+                    #           )
                     
-                # with col2:    
-                #     st.metric("Difference"
-                #               , value = f"{round(diff, 2)} PP"
-                #               , help = 'PP = Percent points'
-                #               )
+                with col2:    
+                    st.metric("Difference"
+                              , value = f"{round(diff, 2)} PP"
+                              , help = 'PP = Percent points'
+                              )
                 #     st.metric("CI upp"
                 #               , value = f"{round(ci_upp * 100, 5)}"
                 #               )
@@ -219,10 +241,10 @@ with st.container():
                 #               , value = f"{round(exp_upp, 5)}"
                 #               )  
 
-                # with col3:
-                #     st.metric("p-value"
-                #               , value = f"{round(pval, 5)}"
-                #               ) 
+                with col3:
+                    st.metric("p-value"
+                              , value = f"{round(pval, 3)}"
+                              ) 
                  
                     
 

@@ -81,87 +81,88 @@ def main():
                                  , index = 0
                                  , help = 'Use one-sided when you want to detect an effect in a specific direction (increase or decrease). Use two-sided when you want to detect an effect in either direction. '
                                 )
-    if weekly_orders > weekly_visits:
-        st.error("You can't have more conversions than visits.")
-    elif weekly_orders == weekly_visits:
-        st.warning('⚠️ You have a Conversion rate of 100 %, there seems to be nothing left to optimize 😲')
-    else:
+    
         # calculate output
         if weekly_visits != None and weekly_orders != None: # calculations should only run when variables are unequal to 0 to avoid errors.
-            CR = weekly_orders / weekly_visits
-            Num_of_weeks = [1, 2, 3, 4, 5, 6]
-            sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
-            mde_per_week = []
-            potential_CR = []
-            difference_CR = []
+            if weekly_orders > weekly_visits:
+                st.error("You can't have more conversions than visits.")
+            elif weekly_orders == weekly_visits:
+                st.warning('⚠️ You have a Conversion rate of 100 %, there seems to be nothing left to optimize 😲')
+            else:          
+                CR = weekly_orders / weekly_visits
+                Num_of_weeks = [1, 2, 3, 4, 5, 6]
+                sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
+                mde_per_week = []
+                potential_CR = []
+                difference_CR = []
 
-            if hypo_type == 'One-sided':
-                hypo = 'larger'
-            else:
-                hypo = 'two-sided'
-
-            for i in Num_of_weeks:
-                mde_i = calculate_mde(alpha = alpha /(num_of_variants - 1) # /(num_of_variants - 1) is the bonferroni correction for multiple comparisons
-                                      , power = power
-                                      , p1 = CR
-                                      , n = i * weekly_visits / num_of_variants
-                                      , alternative = hypo
-                                      )
-                mde = mde_i/CR*100
-                CR_new = CR * (1 + (mde / 100)) * 100
-                CR_diff = ((CR_new / 100) - CR) * 100
-                mde_per_week.append(mde)
-                potential_CR.append(CR_new)
-                difference_CR.append(CR_diff)
-
-        result = pd.DataFrame({'Runtime' : Num_of_weeks
-                               , 'MDE_perc' : mde_per_week
-                               , 'MDE_PP' : difference_CR
-                               , 'Sample_size' : sample_size_per_week
-                               , 'new_CR' : potential_CR
-                               }) 
-
-    # Output display container
-        with st.container():
-            st.subheader('Your result:')
-            colB1, colB2 = st.columns([1, 2])
-
-            with colB1:
-                st.metric('Conversion Rate'
-                          , value = f"{round(CR * 100, 2)} %"
-                          )
-
-            with colB2:
-                st.dataframe(data=result
-                             , hide_index = 1
-                             , column_order = ("Runtime"
-                                               , "MDE_perc"
-                                               , "MDE_PP"
-                                               , "new_CR"
-                                               , "Sample_size"
-                                               )
-                             , column_config = {
-                                'Runtime' : '''Time (weeks)''',
-                                'MDE_perc': st.column_config.NumberColumn(
-                                    'MDE (%)',
-                                    help = 'Minimal detectable effect in percent',
-                                    format = "%.2f %%"),
-                                'MDE_PP': st.column_config.NumberColumn(
-                                    'MDE (PP)',
-                                    help = 'Minimal detectable effect in Percent points',
-                                    format = "%.3f PP"),
-                                'new_CR' : st.column_config.NumberColumn(
-                                    'Potential CR',
-                                    format = "%.2f %%"),
-                                'Sample_size' : 'Sample size per variant'
-                                })
                 if hypo_type == 'One-sided':
-                    st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean an increase of your Conversion rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+                    hypo = 'larger'
                 else:
-                    st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean a Conversion rate between {round((CR * 100) * (1 - result.loc[0, 'MDE_perc']/100), 2)} % and {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+                    hypo = 'two-sided'
 
-        if result.loc[5, 'MDE_perc'] >= 5.00:
-            st.warning('💡 Your MDE is quite high. Consider if the contrast of you A/B test is high enough.')
+                for i in Num_of_weeks:
+                    mde_i = calculate_mde(alpha = alpha /(num_of_variants - 1) # /(num_of_variants - 1) is the bonferroni correction for multiple comparisons
+                                          , power = power
+                                          , p1 = CR
+                                          , n = i * weekly_visits / num_of_variants
+                                          , alternative = hypo
+                                          )
+                    mde = mde_i/CR*100
+                    CR_new = CR * (1 + (mde / 100)) * 100
+                    CR_diff = ((CR_new / 100) - CR) * 100
+                    mde_per_week.append(mde)
+                    potential_CR.append(CR_new)
+                    difference_CR.append(CR_diff)
+
+                result = pd.DataFrame({'Runtime' : Num_of_weeks
+                                       , 'MDE_perc' : mde_per_week
+                                       , 'MDE_PP' : difference_CR
+                                       , 'Sample_size' : sample_size_per_week
+                                       , 'new_CR' : potential_CR
+                                       }) 
+
+            # Output display container
+                with st.container():
+                    st.subheader('Your result:')
+                    colB1, colB2 = st.columns([1, 2])
+    
+                    with colB1:
+                        st.metric('Conversion Rate'
+                                  , value = f"{round(CR * 100, 2)} %"
+                                  )
+    
+                    with colB2:
+                        st.dataframe(data=result
+                                     , hide_index = 1
+                                     , column_order = ("Runtime"
+                                                       , "MDE_perc"
+                                                       , "MDE_PP"
+                                                       , "new_CR"
+                                                       , "Sample_size"
+                                                       )
+                                     , column_config = {
+                                        'Runtime' : '''Time (weeks)''',
+                                        'MDE_perc': st.column_config.NumberColumn(
+                                            'MDE (%)',
+                                            help = 'Minimal detectable effect in percent',
+                                            format = "%.2f %%"),
+                                        'MDE_PP': st.column_config.NumberColumn(
+                                            'MDE (PP)',
+                                            help = 'Minimal detectable effect in Percent points',
+                                            format = "%.3f PP"),
+                                        'new_CR' : st.column_config.NumberColumn(
+                                            'Potential CR',
+                                            format = "%.2f %%"),
+                                        'Sample_size' : 'Sample size per variant'
+                                        })
+                        if hypo_type == 'One-sided':
+                            st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean an increase of your Conversion rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+                        else:
+                            st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean a Conversion rate between {round((CR * 100) * (1 - result.loc[0, 'MDE_perc']/100), 2)} % and {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
+    
+                if result.loc[5, 'MDE_perc'] >= 5.00:
+                    st.warning('💡 Your MDE is quite high. Consider if the contrast of you A/B test is high enough.')
 
 if __name__ == '__main__':
     main()

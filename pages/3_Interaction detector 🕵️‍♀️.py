@@ -17,22 +17,25 @@ def main():
     Navbar()
 
     st.title ("Interaction detector")
+    st.caption('When you run parallel experiments and suspect an interaction between your experiments you can use this detector to test if there is evidence for such an interaction.')
 
     with st.container():
         st.header("Traffic interactions")
+        st.caption('Traffic interactions are defined as an imbalance in the visit distribution between your experiments. In a perfectly randomized experiment you expect, that visits from the control group of your first experiment split equally between control and variant of your second experiment.')
         st.subheader("Please input your data:")
 
-        colA1, colA2 = st.columns([1, 2])
-        with colA1:
-            num_of_experiments = st.number_input('How many experiments did you run in parallel?'
-                                                 , 2
-                                                 , 2
-                                                 , help = 'Currently this calculator only supports analysis of two parallel experiments.'
-                                                 )
+        # Not yet sure that it would really be needed to test more than two parallel experiments
+        # colA1, colA2 = st.columns([1, 2])
+        # with colA1:
+        #     num_of_experiments = st.number_input('How many experiments did you run in parallel?'
+        #                                          , 2
+        #                                          , 2
+        #                                          , help = 'Currently this calculator only supports analysis of two parallel experiments.'
+        #                                          )
 
     df = pd.DataFrame(np.nan
-                      , index=['Visits in A of Experiment 2'
-                               , 'Visits in B of Experiment 2']
+                      , index=['Visits in Control of Experiment 2'
+                               , 'Visits in Variant of Experiment 2']
                       , columns=['A'
                                  , 'B']
                       )
@@ -41,14 +44,16 @@ def main():
                                 , num_rows = 'fixed'
                                 , column_config = {
                                     'A' : st.column_config.NumberColumn(
-                                        label = "Visits in A of Experiment 1"
+                                        label = "Visits in Control of Experiment 1"
                                         , required = True
                                         , default = "int"
+                                        , min_value = 1
                                     ),
                                     'B' : st.column_config.NumberColumn(
-                                        label = "Visits in B of Experiment 1"
+                                        label = "Visits in Variant of Experiment 1"
                                         , required = True
                                         , default = "int"
+                                        , min_value = 1
                                     ),
                                     }
                                     )
