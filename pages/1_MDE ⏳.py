@@ -5,8 +5,8 @@ from modules.functions import footer
 import pandas as pd
 
 st.set_page_config(
-    page_title="PivotPoint - MDE"
-    , page_icon="⏳"
+    page_title="CRO Calculators"
+    , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
     , menu_items=None)

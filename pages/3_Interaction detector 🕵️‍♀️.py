@@ -6,8 +6,8 @@ import pandas as pd
 from scipy.stats import chi2_contingency
 
 st.set_page_config(
-    page_title="PivotPoint - Interaction"
-    , page_icon="🕵️‍♀️"
+    page_title="CRO Calculators"
+    , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
     , menu_items=None)

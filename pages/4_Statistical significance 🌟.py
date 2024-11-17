@@ -6,6 +6,13 @@ import statsmodels.stats.proportion as pp
 import pandas as pd
 import matplotlib.pyplot as plt
 
+st.set_page_config(
+    page_title="CRO Calculators"
+    , page_icon="pictures\Favicon.png"
+    , layout="centered"
+    , initial_sidebar_state="auto"
+    , menu_items=None)
+
 def main():
     Navbar()
 

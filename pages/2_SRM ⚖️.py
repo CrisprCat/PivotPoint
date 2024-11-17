@@ -5,8 +5,8 @@ import numpy as np
 from scipy.stats import chisquare
 
 st.set_page_config(
-    page_title="PivotPoint - SRM"
-    , page_icon="⚖️"
+    page_title="CRO Calculators"
+    , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
     , menu_items=None)

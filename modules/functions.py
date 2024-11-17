@@ -8,7 +8,7 @@ def Navbar():
         st.page_link("pages/2_SRM ⚖️.py", label="Sample ratio mismatch", icon="⚖️")
         st.page_link("pages/3_Interaction detector 🕵️‍♀️.py", label="Interaction detection", icon="🕵️‍♀️")
         st.page_link("pages/4_Statistical significance 🌟.py", label="Statistical significance", icon="🌟")
-        st.page_link("pages/5_FAQ ❓.py", label="Frequently asked questions", icon="❓")
+        # st.page_link("pages/5_FAQ ❓.py", label="Frequently asked questions", icon="❓")
 
 # Create a footer
 from htbuilder import HtmlElement, div, ul, li, br, hr, a, p, img, styles, classes, fonts
