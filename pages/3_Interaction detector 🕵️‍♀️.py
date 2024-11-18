@@ -10,7 +10,15 @@ st.set_page_config(
     , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
-    , menu_items=None)
+    , menu_items=None
+    )
+
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 
 def main():
@@ -21,7 +29,7 @@ def main():
 
     with st.container():
         st.header("Traffic interactions")
-        st.caption('Traffic interactions are defined as an imbalance in the visit distribution between your experiments. In a perfectly randomized experiment you expect, that visits from the control group of your first experiment split equally between control and variant of your second experiment.')
+        st.caption('Traffic interactions are defined as an imbalance in the visitor distribution between your experiments. In a perfectly randomized experiment you expect, that visitors from the control group of your first experiment split equally between control and variant of your second experiment.')
         st.subheader("Please input your data:")
 
         # Not yet sure that it would really be needed to test more than two parallel experiments
@@ -34,8 +42,8 @@ def main():
         #                                          )
 
     df = pd.DataFrame(np.nan
-                      , index=['Visits in Control of Experiment 2'
-                               , 'Visits in Variant of Experiment 2']
+                      , index=['Visitors in Control of Experiment 2'
+                               , 'Visitors in Variant of Experiment 2']
                       , columns=['A'
                                  , 'B']
                       )
@@ -44,13 +52,13 @@ def main():
                                 , num_rows = 'fixed'
                                 , column_config = {
                                     'A' : st.column_config.NumberColumn(
-                                        label = "Visits in Control of Experiment 1"
+                                        label = "Visitors in Control of Experiment 1"
                                         , required = True
                                         , default = "int"
                                         , min_value = 1
                                     ),
                                     'B' : st.column_config.NumberColumn(
-                                        label = "Visits in Variant of Experiment 1"
+                                        label = "Visitors in Variant of Experiment 1"
                                         , required = True
                                         , default = "int"
                                         , min_value = 1

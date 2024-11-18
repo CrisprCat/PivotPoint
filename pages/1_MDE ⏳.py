@@ -9,7 +9,15 @@ st.set_page_config(
     , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
-    , menu_items=None)
+    , menu_items=None
+    )
+
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 def main():
     Navbar()
@@ -28,14 +36,14 @@ def main():
         colA1, colA2, colA3 = st.columns(3)
 
         with colA1:
-            weekly_visits = st.number_input('Average weekly visits'
-                                            , min_value = 1
-                                            , max_value = None
-                                            , value = None
-                                            , step = 1
-                                            , help = 'Enter the number of average weekly visits you expect during your experiment'
-                                            , placeholder = ' Enter a number'
-                                            )
+            weekly_visitors = st.number_input('Average weekly visitors'
+                                              , min_value = 1
+                                              , max_value = None
+                                              , value = None
+                                              , step = 1
+                                              , help = 'Enter the number of average weekly visitors you expect during your experiment'
+                                              , placeholder = ' Enter a number'
+                                              )
             power = st.number_input('Statistical power'
                                     , value = 0.80
                                     , min_value = 0.05
@@ -60,7 +68,7 @@ def main():
                                     , min_value = 0.05
                                     , max_value = 1.00
                                     , step = 0.05
-                                    , help = '\u03B1: The probability of rejecting a null hypothesis, given that it is true'
+                                    , help = '\u03B1: The probability of rejecting a null hypothesis, given that it is true.'
                                     )
             if alpha > 0.1:
                 st.warning('⚠️ This statistical significance level is considered high!')
@@ -83,15 +91,15 @@ def main():
                                 )
     
         # calculate output
-        if weekly_visits != None and weekly_orders != None: # calculations should only run when variables are unequal to 0 to avoid errors.
-            if weekly_orders > weekly_visits:
+        if weekly_visitors != None and weekly_orders != None: # calculations should only run when variables are unequal to 0 to avoid errors.
+            if weekly_orders > weekly_visitors:
                 st.error("You can't have more conversions than visits.")
-            elif weekly_orders == weekly_visits:
+            elif weekly_orders == weekly_visitors:
                 st.warning('⚠️ You have a Conversion rate of 100 %, there seems to be nothing left to optimize 😲')
             else:          
-                CR = weekly_orders / weekly_visits
+                CR = weekly_orders / weekly_visitors
                 Num_of_weeks = [1, 2, 3, 4, 5, 6]
-                sample_size_per_week = [int(i * weekly_visits / num_of_variants) for i in  Num_of_weeks]
+                sample_size_per_week = [int(i * weekly_visitors / num_of_variants) for i in  Num_of_weeks]
                 mde_per_week = []
                 potential_CR = []
                 difference_CR = []
@@ -105,7 +113,7 @@ def main():
                     mde_i = calculate_mde(alpha = alpha /(num_of_variants - 1) # /(num_of_variants - 1) is the bonferroni correction for multiple comparisons
                                           , power = power
                                           , p1 = CR
-                                          , n = i * weekly_visits / num_of_variants
+                                          , n = i * weekly_visitors / num_of_variants
                                           , alternative = hypo
                                           )
                     mde = mde_i/CR*100

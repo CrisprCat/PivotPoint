@@ -12,7 +12,15 @@ st.set_page_config(
     , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
-    , menu_items=None)
+    , menu_items=None
+    )
+
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 def main():
     Navbar()
@@ -70,14 +78,14 @@ with st.container():
     st.subheader("Control")
     col1, col2, col3 = st.columns(3)
     with col1:
-        Visits_control = st.number_input('Number of visits'
-                                         , min_value = 1
-                                         , max_value = None
-                                         , value = None
-                                         , step = 1
-                                         , help = '''Enter the number of visits that you had in the control'''
-                                         , placeholder = 'Enter a number'
-                                         )
+        Visitors_control = st.number_input('Number of visitors'
+                                           , min_value = 1
+                                           , max_value = None
+                                           , value = None
+                                           , step = 1
+                                           , help = '''Enter the number of visitors that you had in the control'''
+                                           , placeholder = 'Enter a number'
+                                           )
     with col2:
         Orders_control = st.number_input('Number of orders'
                                          , min_value = 1
@@ -88,8 +96,8 @@ with st.container():
                                          , placeholder = 'Enter a number'
                                          )
     with col3:
-        if Visits_control != None and Orders_control != None:
-            CR_control = Orders_control / Visits_control
+        if Visitors_control != None and Orders_control != None:
+            CR_control = Orders_control / Visitors_control
             CR_control_perc = CR_control * 100
             st.metric("Control conversion rate"
                       , value = f"{round(CR_control, 2)} %")
@@ -98,14 +106,14 @@ with st.container():
     st.subheader("Variant")
     col1, col2, col3 = st.columns(3)
     with col1:
-        Visits_variant = st.number_input('Number of visits'
-                                         , min_value = 1
-                                         , max_value = None
-                                         , value = None
-                                         , step = 1
-                                         , help = '''Enter the number of visits that you had in the variant'''
-                                         , placeholder = 'Enter a number'
-                                         )
+        Visitors_variant = st.number_input('Number of visitors'
+                                           , min_value = 1
+                                           , max_value = None
+                                           , value = None
+                                           , step = 1
+                                           , help = '''Enter the number of visitors that you had in the variant'''
+                                           , placeholder = 'Enter a number'
+                                           )
     with col2:
         Orders_variant = st.number_input('Number of orders'
                                          , min_value = 1
@@ -116,15 +124,15 @@ with st.container():
                                          , placeholder = 'Enter a number'
                                          )
     with col3:
-        if Visits_variant != None and Orders_variant != None:
-            CR_variant = Orders_variant / Visits_variant
+        if Visitors_variant != None and Orders_variant != None:
+            CR_variant = Orders_variant / Visitors_variant
             CR_variant_perc = CR_variant * 100
             st.metric("Variant conversion rate"
                       , value = f"{round(CR_variant, 2)} %")
             
 ## SRM check of input data
-    if Visits_control != None and Visits_variant != None:
-        sample_sizes = [Visits_control, Visits_variant]
+    if Visitors_control != None and Visitors_variant != None:
+        sample_sizes = [Visitors_control, Visitors_variant]
         SRM_result = chisquare(sample_sizes
                                , f_exp = None)
         if SRM_result.pvalue < 0.1:
@@ -133,7 +141,7 @@ with st.container():
 
         with st.container():
             col1, col2, col3 = st.columns(3)
-            if Visits_control != None and Orders_control != None and Visits_variant != None and Orders_variant != None:
+            if Visitors_control != None and Orders_control != None and Visitors_variant != None and Orders_variant != None:
                 # Calculate summary
                 diff = CR_variant_perc - CR_control_perc
                 lift = diff / CR_control_perc * 100
@@ -162,7 +170,7 @@ with st.container():
                                                    , method = "normal")
                 
                 posthoc_power = pw.zt_ind_solve_power(effect_size = effect
-                                                      , nobs1 = Visits_control
+                                                      , nobs1 = Visitors_control
                                                       , alpha = alpha
                                                       , alternative = hypo_type)
                 if posthoc_power < 0.8:

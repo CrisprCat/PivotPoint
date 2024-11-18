@@ -7,14 +7,20 @@ st.set_page_config(
     , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
-    , menu_items=None)
+    , menu_items=None
+    )
 
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 def main():
     Navbar()
 
-    st.title("CRO Calculators 🎈")
-    st.subheader("The One Where We Optimize")
+    st.title("🧮 CRO Calculators")
     st.write(
         "This app is intended to provide a tool collection about statistical hypothesis testing all around AB testing.  "
     )

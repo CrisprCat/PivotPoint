@@ -9,13 +9,21 @@ st.set_page_config(
     , page_icon="pictures\Favicon.png"
     , layout="centered"
     , initial_sidebar_state="auto"
-    , menu_items=None)
+    , menu_items=None
+    )
+
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 def main():
     Navbar()
 
     st.title ("Sample ratio mismatch (SRM) detector")
-    st.caption('Use this calculator to detect discrepancies between your expected and actual number of visits per sample in your experiment.')
+    st.caption('Use this calculator to detect discrepancies between your expected and actual number of visitors per sample in your experiment.')
 
     # Initial Input container
     with st.container():
@@ -27,9 +35,9 @@ def main():
                                              , step = 1
                                              )
         with colA2:
-            distribution = st.radio('What distribution did you set between control and variants'
+            distribution = st.radio('What distribution did you set between control and variants?'
                                     , ['Equal', 'Unequal']
-                                    , help = 'Choose Equal when you expect the same number of visits in all your variants'
+                                    , help = 'Choose Equal when you expect the same number of visitors in all your variants.'
                                     )
 
     # Variable input container
@@ -43,7 +51,7 @@ def main():
         for i in range(num_of_samples):
             if i % 2 == 0:
                 with col1:
-                    sample_size = st.number_input(f"Visits in Sample {i+1}:"
+                    sample_size = st.number_input(f"Visitors in Sample {i+1}:"
                                                   , key = f"input_{i+1}"
                                                   , min_value = 1
                                                   , max_value = None
@@ -54,7 +62,7 @@ def main():
                     sample_sizes.append(sample_size)
             else:
                 with col2:
-                    sample_size = st.number_input(f"Visits in Sample {i+1}:"
+                    sample_size = st.number_input(f"Visitors in Sample {i+1}:"
                                                   , key = f"input_{i+1}"
                                                   , min_value = 1
                                                   , max_value = None
