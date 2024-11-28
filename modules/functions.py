@@ -80,6 +80,9 @@ def footer():
               width=px(25), height=px(25)),
         " with ❤️ by ",
         link("https://www.linkedin.com/in/dr-katharina-bursch-143a70120", "Kathi"),
+        ". Find source code at ",
+        link("https://github.com/CrisprCat/PivotPoint", "Github"),
+        "."
     ]
     layout(*myargs)
 
