@@ -12,7 +12,7 @@ st.set_page_config(
     , initial_sidebar_state="auto"
     , menu_items=None
     )
-
+# hide burger menu
 hide_menu_style = """
         <style>
         #MainMenu {visibility: hidden;}
@@ -32,39 +32,30 @@ def main():
         st.caption('Traffic interactions are defined as an imbalance in the visitor distribution between your experiments. In a perfectly randomized experiment you expect, that visitors from the control group of your first experiment split equally between control and variant of your second experiment.')
         st.subheader("Please input your data:")
 
-        # Not yet sure that it would really be needed to test more than two parallel experiments
-        # colA1, colA2 = st.columns([1, 2])
-        # with colA1:
-        #     num_of_experiments = st.number_input('How many experiments did you run in parallel?'
-        #                                          , 2
-        #                                          , 2
-        #                                          , help = 'Currently this calculator only supports analysis of two parallel experiments.'
-        #                                          )
+    df = pd.DataFrame(
+        np.nan
+        , index=['Visitors in Control of Experiment 2', 'Visitors in Variant of Experiment 2']
+        , columns=['A', 'B']
+        )
 
-    df = pd.DataFrame(np.nan
-                      , index=['Visitors in Control of Experiment 2'
-                               , 'Visitors in Variant of Experiment 2']
-                      , columns=['A'
-                                 , 'B']
-                      )
-
-    input_data = st.data_editor(data = df
-                                , num_rows = 'fixed'
-                                , column_config = {
-                                    'A' : st.column_config.NumberColumn(
-                                        label = "Visitors in Control of Experiment 1"
-                                        , required = True
-                                        , default = "int"
-                                        , min_value = 1
-                                    ),
-                                    'B' : st.column_config.NumberColumn(
-                                        label = "Visitors in Variant of Experiment 1"
-                                        , required = True
-                                        , default = "int"
-                                        , min_value = 1
-                                    ),
-                                    }
-                                    )
+    input_data = st.data_editor(
+        data = df
+        , num_rows = 'fixed'
+        , column_config = {
+            'A' : st.column_config.NumberColumn(
+                label = "Visitors in Control of Experiment 1"
+                , required = True
+                , default = "int"
+                , min_value = 1
+            ),
+            'B' : st.column_config.NumberColumn(
+                label = "Visitors in Variant of Experiment 1"
+                , required = True
+                , default = "int"
+                , min_value = 1
+            ),
+            }
+            )
 
     print(input_data)
     print(chi2_contingency(input_data))
@@ -81,23 +72,3 @@ if __name__ == '__main__':
     main()
     footer()
 
-
-
-
-
-
-
-
-
-
-# st.title ("Metric interactions")
-
-# import pandas as pd
-
-# from statsmodels.formula.api import ols
-
-# model = ols("REVENUE ~ X_VARIATION_NAME * Y_VARIATION_NAME", data=pdf_xy_rpv)
-
-# results = model.fit()
-
-# results.summary()

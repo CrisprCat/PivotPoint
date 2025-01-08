@@ -8,13 +8,11 @@ def Navbar():
         st.page_link("pages/2_SRM ⚖️.py", label="Sample ratio mismatch (SRM) detector", icon="⚖️")
         st.page_link("pages/3_Interaction detector 🕵️‍♀️.py", label="Interaction detector", icon="🕵️‍♀️")
         st.page_link("pages/4_Statistical significance 🌟.py", label="Statistical hypothesis tester", icon="🌟")
-        # st.page_link("pages/5_FAQ ❓.py", label="Frequently asked questions", icon="❓")
 
 # Create a footer
 from htbuilder import HtmlElement, div, ul, li, br, hr, a, p, img, styles, classes, fonts
 from htbuilder.units import percent, px
 from htbuilder.funcs import rgba, rgb
-
 
 def image(src_as_string, **style):
     return img(src=src_as_string, style=styles(**style))
@@ -87,18 +85,47 @@ def footer():
     layout(*myargs)
 
 # Define mde function
-from statsmodels.stats.power import zt_ind_solve_power
+from statsmodels.stats import power as pwr
 import math
 
-def calculate_mde(alpha, power, p1, n, alternative):
+def calculate_mde_CR(alpha, power, p1, n, alternative):
     # Calculate the effect size using statsmodels
-    effect_size = zt_ind_solve_power(effect_size=None # returns the effect size as a standardized value
-                                     , nobs1=n 
-                                     , alpha=alpha 
-                                     , power=power 
-                                     , alternative=alternative
-                                     , ratio = 1.0
-                                     )
+    effect_size = pwr.zt_ind_solve_power(effect_size=None # returns the effect size as a standardized value
+                                        , nobs1=n 
+                                        , alpha=alpha 
+                                        , power=power 
+                                        , alternative=alternative
+                                        , ratio = 1.0
+                                        )
     # Translate effect size to MDE
     mde = effect_size * math.sqrt(p1 * (1 - p1))
     return mde
+
+## Sanity checks for csv file uploads
+### check if revenue file data only contains numeric values
+import pandas as pd
+def check_numeric_columns (df, col_indices):
+    is_numeric = []
+    for col_idx in col_indices:
+        col = df.iloc[:, col_idx]
+        is_numeric.append(pd.to_numeric(col, errors = 'coerce').notnull().all())
+
+    return all(is_numeric)
+
+### check if revenue file contains orders with revenue <=0
+def check_value_size(df, col_indices):
+    is_greater_zero = df.iloc[:, col_indices].gt(0).all().all()
+
+    return is_greater_zero
+
+def calculate_mde_RPV(alpha, power, n, ttype, std):
+    analysis = pwr.TTestIndPower()
+    RPV_effect_size = analysis.solve_power(effect_size = None
+                                           , nobs1 = n
+                                           , alpha = alpha
+                                           , power = power
+                                           , ratio = 1.0
+                                           , alternative = ttype)
+    RPV_mde = (RPV_effect_size * std)
+    return RPV_mde
+

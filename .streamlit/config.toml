@@ -1,9 +1,7 @@
 [client]
 showSidebarNavigation = false
 
-
 [theme]
-
 # Primary accent for interactive elements
 primaryColor = '#306844'
 
