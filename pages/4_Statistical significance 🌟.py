@@ -4,10 +4,10 @@ from modules.functions import footer
 from scipy.stats import chisquare
 import statsmodels.stats.proportion as pp
 import statsmodels.stats.power as pw
-import numpy as np
 import pandas as pd
+from modules.stat_functions import check_numeric_columns
+from modules.stat_functions import check_value_size
 from statsmodels.stats.weightstats import ttest_ind
-# import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="CRO Calculators"
@@ -348,15 +348,13 @@ def main():
                     )
                 # Sanity checks
                 ## The column should only contain numeric values
-                from modules.functions import check_numeric_columns
                 san_num = check_numeric_columns (rpv_control_revenue_df, [0])
                 if san_num == False:
                     st.warning(
                         'It looks like your revenue data contains non-numeric values.'
                         , icon = '⚠️')
                 else:
-                    ## All values should be > 0  
-                    from modules.functions import check_value_size
+                    ## All values should be > 0    
                     san_zero = check_value_size(rpv_control_revenue_df, 0) 
                     if san_zero == False:
                         st.warning(
@@ -434,7 +432,6 @@ def main():
                         )
                     # Sanity checks
                     ## The column should only contain numeric values
-                    from modules.functions import check_numeric_columns
                     san_num = check_numeric_columns (rpv_variant_revenue_df, [0])
                     if san_num == False:
                         st.warning(
@@ -442,7 +439,6 @@ def main():
                             , icon = '⚠️')
                     else:
                         ## All values should be > 0  
-                        from modules.functions import check_value_size
                         san_zero = check_value_size(rpv_variant_revenue_df, 0) 
                         if san_zero == False:
                             st.warning(

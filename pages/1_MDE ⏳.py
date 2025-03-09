@@ -1,7 +1,8 @@
 import streamlit as st
 from modules.functions import Navbar
 from modules.functions import footer
-from modules.functions import calculate_mde_CR
+from modules.stat_functions import mde_cr
+from modules.stat_functions import mde_cont
 import pandas as pd
 
 st.set_page_config(
@@ -56,26 +57,22 @@ def main():
             if alpha >= 0.1:
                 st.warning('⚠️ This statistical significance level is considered high!')
         with col3:
-            num_of_variants = st.number_input(
+            num_variants = st.number_input(
                 'Number of variants'
                 , min_value = 1
                 , max_value = None
                 , value = 1
                 , step = 1
                 , help = '''Enter the number of variants you want to test. You should always have one control group + a variable number of variants.  
-                For more than 2 variants Bonferroni correction is applied'''
+                For more than 1 variant Bonferroni correction is applied'''
                 )
         with col4:
-            hypo_type = st.radio(
+            hypo = st.radio(
                 'Hypothesis type'
                 , options = ['Two-sided', 'One-sided']
                 , index = 0
                 , help = 'Use one-sided when you want to detect an effect in a specific direction (increase or decrease). Use two-sided when you want to detect an effect in either direction. '
                 )
-            if hypo_type == 'One-sided':
-                hypo = 'larger'
-            else:
-                hypo = 'two-sided'
     
     # Input container CR
     with st.container():
@@ -118,18 +115,18 @@ def main():
             else:          
                 CR = cr_weekly_orders / cr_weekly_visitors
                 Num_of_weeks = [1, 2, 3, 4, 5, 6]
-                CR_sample_size_per_week = [int(i * cr_weekly_visitors / num_of_variants) for i in  Num_of_weeks]
+                CR_sample_size_per_week = [int(i * cr_weekly_visitors / (num_variants + 1)) for i in  Num_of_weeks]
                 mde_per_week = []
                 potential_CR = []
                 difference_CR = []
 
                 for i in Num_of_weeks:
-                    mde_i = calculate_mde_CR(
-                        alpha = alpha /(num_of_variants) # /(num_of_variants) is the bonferroni correction for multiple comparisons
+                    mde_i = mde_cr(
+                        sample_size = i * cr_weekly_visitors / (num_variants + 1)
+                        , baseline = CR
+                        , alpha = alpha /(num_variants + 1) # /(num_variants) is the bonferroni correction for multiple comparisons
                         , power = power
-                        , p1 = CR
-                        , n = i * cr_weekly_visitors / num_of_variants
-                        , alternative = hypo
+                        , test_type = hypo
                         )
                     mde = mde_i/CR*100
                     CR_new = CR * (1 + (mde / 100)) * 100
@@ -184,7 +181,7 @@ def main():
                                     format = "%.2f %%"),
                                 'Sample_size' : 'Sample size per variant'
                                 })
-                        if hypo_type == 'One-sided':
+                        if hypo == 'One-sided':
                             st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean an increase of your Conversion rate from {round(CR * 100, 2)} % to {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
                         else:
                             st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(result.loc[0, 'MDE_perc'], 2)} %. This could mean a Conversion rate between {round((CR * 100) * (1 - result.loc[0, 'MDE_perc']/100), 2)} % and {round((CR * 100) * (1 + result.loc[0, 'MDE_perc']/100), 2)} %")
@@ -195,7 +192,7 @@ def main():
     # Input container RPV
     with st.container():
         st.header('Continuous metric (Revenue per Visitor, RPV)')
-        st.caption('For a continuous metric this calculator uses the t-test.')
+        st.caption('For a continuous metric this calculator uses the z-test.')
         st.subheader('Input your data:')
 
         # Insert 3 columns to place input widgets in them
@@ -232,7 +229,7 @@ def main():
             
             # Sanity checks
             ## The column should only contain numeric values
-            from modules.functions import check_numeric_columns
+            from modules.stat_functions import check_numeric_columns
             san_num = check_numeric_columns (rpv_df, [0])
             if san_num == False:
                 st.warning(
@@ -240,7 +237,7 @@ def main():
                     , icon = '⚠️')
             else:
                 ## All values shoudl be > 0  
-                from modules.functions import check_value_size
+                from modules.stat_functions import check_value_size
                 san_zero = check_value_size(rpv_df, 0) 
                 if san_zero == False:
                     st.warning(
@@ -273,18 +270,18 @@ def main():
                             # print(RPV_full_data)
 
                             Num_of_weeks = [1, 2, 3, 4, 5, 6]
-                            RPV_sample_size_per_week = [int(i * (RPV_num_visitors/4) / num_of_variants) for i in  Num_of_weeks]
+                            RPV_sample_size_per_week = [int(i * (RPV_num_visitors/4) / (num_variants + 1)) for i in  Num_of_weeks]
                             RPV_mde_per_week = []
                             potential_RPV = []
                             difference_RPV = [] 
-                            from modules.functions import calculate_mde_RPV
+
                             for i in Num_of_weeks:
-                                mde_i = calculate_mde_RPV(
-                                    alpha = alpha /(num_of_variants) # /(num_of_variants) is the bonferroni correction for multiple comparisons
+                                mde_i = mde_cont(
+                                    sample_size = i * (RPV_num_visitors/4)
+                                    , std_dev = RPV_std
+                                    , alpha = alpha /(num_variants) # /(num_of_variants) is the bonferroni correction for multiple comparisons
                                     , power = power
-                                    , n = i * (RPV_num_visitors/4)
-                                    , ttype = hypo
-                                    , std = RPV_std
+                                    , test_type = hypo
                                     )
                                 mde = (mde_i/RPV_mean * 100)
                                 RPV_mde_per_week.append(mde)
@@ -301,7 +298,7 @@ def main():
                                 , 'new_RPV' : potential_RPV
                                 }
                                 )
-                            # Output display container CR
+                            # Output display container Cont
                             with st.container():
                                 st.subheader('Your result:')
                                 col_RPV_B1, col_RPV_B2, col_RPV_B3 = st.columns(3)
@@ -346,7 +343,7 @@ def main():
                                                     format = "%.2f %% €"),
                                                 'RPV_Sample_size' : 'Sample size per variant'
                                                 })
-                                if hypo_type == 'One-sided':
+                                if hypo == 'One-sided':
                                     st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(RPV_result.loc[0, 'RPV_MDE_perc'], 2)} %. This could mean an increase of your Revenue per Visitor from {round(RPV_mean, 2)} € to {round(RPV_mean * (1 + RPV_result.loc[0, 'RPV_MDE_perc']/100), 2)} €")
                                 else:
                                     st.caption(f"Reading example: After 1 week of runtime you would be able to statistically reliably detect an effect of {round(RPV_result.loc[0, 'RPV_MDE_perc'], 2)} %. This could mean a Conversion rate between {round((RPV_mean) * (1 - RPV_result.loc[0, 'RPV_MDE_perc']/100), 2)} % and {round((RPV_mean) * (1 + RPV_result.loc[0, 'RPV_MDE_perc']/100), 2)} €")
